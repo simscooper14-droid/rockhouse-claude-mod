@@ -1,0 +1,10 @@
+{
+  "extraKnownMarketplaces": {
+    "rockhouse": {
+      "source": { "source": "github", "repo": "simscooper14-droid/rockhouse-claude-mod" }
+    }
+  },
+  "enabledPlugins": {
+    "rockhouse@rockhouse": true
+  }
+}
