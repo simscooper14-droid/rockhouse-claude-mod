@@ -1,0 +1,5 @@
+{
+  "name": "rockhouse",
+  "owner": { "name": "Rockhouse Christian Church" },
+  "plugins": [{ "name": "rockhouse", "source": "./" }]
+}
