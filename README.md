@@ -7,6 +7,7 @@ What it does:
 - **Theme** (Claude desktop and mobile apps): warm white pages by day and a deep Rockhouse Navy by night, navy message bubbles, and a faint line drawing of the Rockhouse building (steeple, cross, stone base) in the top-right corner.
 - **Countdown band** above the prompt: the next two Rockhouse dates with how many days are left, such as "Launch Sunday · Sun, Dec 6 at 10:30 AM · in 13 days".
 - **Status line**: the next date at a glance, such as "Rockhouse · Launch Sunday in 13 days".
+- **Weekly usage meter**: your Claude plan's weekly (seven-day) usage, in the status line ("Week 42% used") and the band (with when it resets, Central time). It shows once Claude has reported a reading, after the first reply of a session, and only on a subscription plan.
 - **`/rockhouse`** command: lists every upcoming date.
 
 ## Install

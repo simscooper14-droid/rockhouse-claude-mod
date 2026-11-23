@@ -57,3 +57,12 @@ export function upcoming(nowMs: number, count: number): Upcoming[] {
     .slice(0, count)
     .map(event => describe(event, nowMs))
 }
+
+// "Sun 3:00 PM" in Central time, for a UTC timestamp.
+export function centralShort(utcMs: number): string {
+  const local = new Date(utcMs + centralOffsetHours(utcMs) * 3600_000)
+  const h = local.getUTCHours()
+  const mi = local.getUTCMinutes()
+  const hour12 = ((h + 11) % 12) + 1
+  return `${DAYS[local.getUTCDay()]} ${hour12}:${String(mi).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`
+}

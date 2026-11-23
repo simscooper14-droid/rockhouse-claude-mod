@@ -1,6 +1,6 @@
 import type { Register, ThemeSetArgs } from 'claude-code'
 
-import { upcoming } from './events'
+import { centralShort, upcoming } from './events'
 import { makeColors } from './make-colors.js'
 import { SCENE } from './scene'
 
@@ -80,11 +80,29 @@ const LOOK: ThemeSetArgs = {
   },
 }
 
-function statusLine(nowMs: number): string {
+type Weekly = { percent: number; resets?: string }
+
+// The weekly (seven-day) plan window from the last API response, if any.
+async function weekly($: { session: { usage: () => Promise<{ rateLimits: { kind: string; percentUsed: number; resetsAt?: string }[] }> } }): Promise<Weekly | undefined> {
+  try {
+    const { rateLimits } = await $.session.usage()
+    const week = rateLimits.find(one => one.kind === 'seven_day')
+    if (week === undefined) {
+      return undefined
+    }
+    const at = week.resetsAt === undefined ? NaN : Date.parse(week.resetsAt)
+    return { percent: Math.round(week.percentUsed), resets: Number.isNaN(at) ? undefined : centralShort(at) }
+  } catch {
+    return undefined
+  }
+}
+
+function statusLine(nowMs: number, week: Weekly | undefined): string {
   const [next] = upcoming(nowMs, 1)
-  return next === undefined
+  const head = next === undefined
     ? 'Rockhouse · Built on the Rock'
     : `Rockhouse · ${next.event.name} ${next.countdown}`
+  return week === undefined ? head : `${head} · Week ${week.percent}% used`
 }
 
 export const register: Register = on => {
@@ -105,7 +123,7 @@ export const register: Register = on => {
     if (!set.isDrawn) {
       $.ui.log(`Rockhouse look not drawn here: ${set.reason}`)
     }
-    $.ui.status(statusLine(await $.clock.now()))
+    $.ui.status(statusLine(await $.clock.now(), await weekly($)))
 
     await $.command.register({
       name: 'rockhouse',
@@ -115,8 +133,13 @@ export const register: Register = on => {
     return next(e)
   })
 
+  on('session.measure', async ($, e, next) => {
+    $.ui.status(statusLine(await $.clock.now(), await weekly($)))
+    return next(e)
+  })
+
   on('turn.complete', async ($, e, next) => {
-    $.ui.status(statusLine(await $.clock.now()))
+    $.ui.status(statusLine(await $.clock.now(), await weekly($)))
     return next(e)
   })
 
@@ -147,7 +170,8 @@ export const register: Register = on => {
       return next(e)
     }
     const list = upcoming(await $.clock.now(), 2)
-    if (list.length === 0) {
+    const week = await weekly($)
+    if (list.length === 0 && week === undefined) {
       return next(e)
     }
     const { Box, Text } = $.ui.resolve(e)
@@ -165,6 +189,12 @@ export const register: Register = on => {
             </Text>
           </Text>
         ))}
+        {week !== undefined && (
+          <Text>
+            <Text weight="semibold">Weekly usage {week.percent}%</Text>
+            {week.resets !== undefined && <Text dimColor> · resets {week.resets}</Text>}
+          </Text>
+        )}
       </Box>
     )
   })
