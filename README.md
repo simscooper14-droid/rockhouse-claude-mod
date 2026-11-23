@@ -17,7 +17,14 @@ At the prompt of a Claude Code session:
 /plugin install rockhouse --marketplace simscooper14-droid/rockhouse-claude-mod
 ```
 
-Answer `y` to add the marketplace, then pick a scope. This repository is private, so the computer you install on needs to be signed in to GitHub with access to it.
+Answer `y` to add the marketplace, then pick a scope.
+
+From a shell instead:
+
+```
+claude plugin marketplace add simscooper14-droid/rockhouse-claude-mod
+claude plugin install rockhouse@rockhouse --scope user
+```
 
 ## Updating the dates
 
